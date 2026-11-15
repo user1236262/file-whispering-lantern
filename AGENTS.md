@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- The game is the original single-file build at `public/game/mars-base-buddies.html`, shown on `/` in a same-origin iframe. Why: it keeps gameplay byte-identical; new features (e.g. NASA data) live in the app shell or server functions, not in the minified game.
