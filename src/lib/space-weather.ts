@@ -94,18 +94,18 @@ const newestFirst = <T>(items: T[], time: (t: T) => string) =>
 
 export function normalizeFlares(raw: unknown): FlareRecord[] {
   const items = asRecords(raw).flatMap((r) => {
-    const id = str(r.flrID);
-    const beginTime = str(r.beginTime);
+    const id = str(r["flrID"]);
+    const beginTime = str(r["beginTime"]);
     if (!id || !beginTime) return [];
     return [
       {
         id,
         beginTime,
-        peakTime: str(r.peakTime),
-        classType: str(r.classType) ?? "?",
-        sourceLocation: str(r.sourceLocation),
-        activeRegion: num(r.activeRegionNum),
-        link: str(r.link),
+        peakTime: str(r["peakTime"]),
+        classType: str(r["classType"]) ?? "?",
+        sourceLocation: str(r["sourceLocation"]),
+        activeRegion: num(r["activeRegionNum"]),
+        link: str(r["link"]),
       },
     ];
   });
@@ -115,35 +115,35 @@ export function normalizeFlares(raw: unknown): FlareRecord[] {
 type Analysis = { speed: number | null; halfAngle: number | null; type: string | null; link: string | null };
 
 function pickAnalysis(r: Record<string, unknown>): Analysis {
-  return { speed: num(r.speed), halfAngle: num(r.halfAngle), type: str(r.type), link: str(r.link) };
+  return { speed: num(r["speed"]), halfAngle: num(r["halfAngle"]), type: str(r["type"]), link: str(r["link"]) };
 }
 
 /** Joins CME records with their most accurate CMEAnalysis (from the CMEAnalysis feed, else embedded). */
 export function normalizeCmes(rawCmes: unknown, rawAnalyses: unknown): CmeRecord[] {
   const byCme = new Map<string, Analysis>();
   for (const a of asRecords(rawAnalyses)) {
-    const cmeId = str(a.associatedCMEID);
+    const cmeId = str(a["associatedCMEID"]);
     if (cmeId && !byCme.has(cmeId)) byCme.set(cmeId, pickAnalysis(a));
   }
   const items = asRecords(rawCmes).flatMap((r) => {
-    const id = str(r.activityID);
-    const startTime = str(r.startTime);
+    const id = str(r["activityID"]);
+    const startTime = str(r["startTime"]);
     if (!id || !startTime) return [];
-    const embedded = asRecords(r.cmeAnalyses);
-    const embeddedBest = embedded.find((a) => a.isMostAccurate === true) ?? embedded[0];
+    const embedded = asRecords(r["cmeAnalyses"]);
+    const embeddedBest = embedded.find((a) => a["isMostAccurate"] === true) ?? embedded[0];
     const analysis = byCme.get(id) ?? (embeddedBest ? pickAnalysis(embeddedBest) : null);
-    const note = str(r.note);
+    const note = str(r["note"]);
     return [
       {
         id,
         startTime,
         note: note && note.length > 220 ? `${note.slice(0, 217)}…` : note,
-        sourceLocation: str(r.sourceLocation),
+        sourceLocation: str(r["sourceLocation"]),
         speed: analysis?.speed ?? null,
         halfAngle: analysis?.halfAngle ?? null,
         analysisType: analysis?.type ?? null,
         analysisLink: analysis?.link ?? null,
-        link: str(r.link),
+        link: str(r["link"]),
       },
     ];
   });
@@ -152,13 +152,13 @@ export function normalizeCmes(rawCmes: unknown, rawAnalyses: unknown): CmeRecord
 
 export function normalizeSeps(raw: unknown): SepRecord[] {
   const items = asRecords(raw).flatMap((r) => {
-    const id = str(r.sepID);
-    const eventTime = str(r.eventTime);
+    const id = str(r["sepID"]);
+    const eventTime = str(r["eventTime"]);
     if (!id || !eventTime) return [];
-    const instruments = asRecords(r.instruments)
-      .map((i) => str(i.displayName))
+    const instruments = asRecords(r["instruments"])
+      .map((i) => str(i["displayName"]))
       .filter((n): n is string => !!n);
-    return [{ id, eventTime, instruments, link: str(r.link) }];
+    return [{ id, eventTime, instruments, link: str(r["link"]) }];
   });
   return newestFirst(items, (s) => s.eventTime);
 }
