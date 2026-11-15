@@ -32,3 +32,4 @@ use the editor.
 ## Project rules
 
 - The game is the original single-file build at `public/game/mars-base-buddies.html`, shown on `/` in a same-origin iframe. Why: it keeps gameplay byte-identical; new features (e.g. NASA data) live in the app shell or server functions, not in the minified game.
+- NASA DONKI is fetched only in `src/lib/space-weather.server.ts` via the `getRealSpaceWeather` server function, with fixed feeds/ranges and an in-memory cache. Why: keeps the NASA key server-side and protects the hourly quota.
